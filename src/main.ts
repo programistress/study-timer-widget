@@ -8,6 +8,9 @@ import {
   type StudySession,
 } from "./sessions/sessionTypes";
 import { loadSessions, saveSessions, loadActive, saveActive } from "./sessions/sessionStore";
+import { open } from "@tauri-apps/plugin-dialog";
+import { loadSettings, saveSettings } from "./settings/settingsStore";
+import { saveSessionToVault } from "./obsidian/obsidianWriter";
 
 
 interface AppState {
@@ -23,13 +26,11 @@ const todayTotal = document.querySelector<HTMLElement>("#today-total")!;
 const sessionCount = document.querySelector<HTMLElement>("#session-count")!;
 const sessionList = document.querySelector<HTMLElement>("#session-list")!;
 
-// Finished sessions. Loaded from sessions.json once at startup (top-level await: the file waits for this before continuing).
+// Finished sessions. Loaded from sessions.json once at startup
 const sessions: StudySession[] = await loadSessions();
 
-// setInterval gives back an id; we keep it so we can cancel the interval on stop.
 let tickId: number | null = null;
 
-// 5025000 ms -> "01:23:45"
 function formatElapsed(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
   const h = Math.floor(totalSeconds / 3600);
@@ -53,7 +54,6 @@ function tick(): void {
   render();
 }
 
-// Shared by a fresh Start and by recovering an unfinished session on launch.
 function beginTicking(): void {
   state.isRunning = true;
   tickId = window.setInterval(tick, 250);
@@ -70,10 +70,12 @@ function stopTimer(): void {
   if (tickId !== null) window.clearInterval(tickId);
   tickId = null;
   const { startedAt, endedAt } = stop();
-  sessions.push(buildSession(startedAt, endedAt));
-  // Not awaited: the UI shouldn't freeze on disk I/O. A failed save is logged, not silent.
+  const session = buildSession(startedAt, endedAt);
+  sessions.push(session);
   saveSessions(sessions).catch((err) => console.error("Could not save sessions:", err));
-  // Session is finished and saved, so clear the "unfinished" marker.
+  if (settings.vaultPath !== null) {
+    saveSessionToVault(settings.vaultPath, session).catch((err) => console.error("Could not write to vault:", err));
+  }
   saveActive(null).catch((err) => console.error("Could not clear active session:", err));
   state.isRunning = false;
   state.elapsedMs = 0;
@@ -89,9 +91,30 @@ toggleBtn.addEventListener("click", () => {
 const unfinishedStartedAt = await loadActive();
 if (unfinishedStartedAt !== null) {
   resume(unfinishedStartedAt);
-  beginTicking(); // also renders, so the timer shows the recovered elapsed time immediately
+  beginTicking();
 }
 
 render();
 
+const vaultBtn = document.querySelector<HTMLButtonElement>("#vault-btn")!;
+const vaultPath = document.querySelector<HTMLElement>("#vault-path")!;
 
+const settings = await loadSettings();
+
+function renderVault(): void {
+  vaultPath.textContent = settings.vaultPath ?? "No vault chosen";
+}
+
+async function chooseVault(): Promise<void> {
+  const picked = await open({ directory: true });
+  if (picked === null) return;
+  settings.vaultPath = picked;
+  await saveSettings(settings);
+  renderVault();
+}
+
+vaultBtn.addEventListener("click", () => {
+  chooseVault().catch((err) => console.error("Could not choose vault:", err));
+});
+
+renderVault();
