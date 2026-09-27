@@ -151,28 +151,28 @@ body {
 }
 
 #timer-display {
-  font-size: 5.2vmin;
+  font-size: 6.4vmin;
   letter-spacing: 1px;
 }
 
 #toggle-btn {
   font-family: inherit;
-  font-size: 2.6vmin;
+  font-size: 3.2vmin;
   color: var(--purple);
   background: var(--pink);
-  border: 0.9vmin solid var(--purple);
-  box-shadow: 0.9vmin 0.9vmin 0 var(--purple);
-  padding: 2.3vmin 3.5vmin;
+  border: 1.1vmin solid var(--purple);
+  box-shadow: 1.1vmin 1.1vmin 0 var(--purple);
+  padding: 2.8vmin 4.2vmin;
   cursor: pointer;
 }
 
 #toggle-btn:active {
-  transform: translate(0.6vmin, 0.6vmin);
-  box-shadow: 0.3vmin 0.3vmin 0 var(--purple);
+  transform: translate(0.7vmin, 0.7vmin);
+  box-shadow: 0.4vmin 0.4vmin 0 var(--purple);
 }
 
 #today-total {
-  font-size: 2.3vmin;
+  font-size: 2.8vmin;
   margin: 0;
 }
 
@@ -180,8 +180,8 @@ body {
   list-style: none;
   margin: 0;
   padding: 1.2vmin 0;
-  font-size: 2vmin;
-  max-height: 14vmin;
+  font-size: 2.4vmin;
+  max-height: 15vmin;
   overflow-y: auto;
 }
 
