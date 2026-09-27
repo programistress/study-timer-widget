@@ -2,21 +2,57 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
+    "core:window:allow-close",
+    "core:window:allow-minimize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-size",
     "opener:default",
     "dialog:allow-open",
     "fs:default",
     "fs:allow-appdata-write-recursive",
-    { "identifier": "fs:allow-exists", "allow": [{ "path": "$HOME/**" }] },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
     {
       "identifier": "fs:allow-read-text-file",
-      "allow": [{ "path": "$HOME/**" }]
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-write-text-file",
-      "allow": [{ "path": "$HOME/**" }]
+      "allow": [
+        {
+          "path": "$HOME/**"
+        }
+      ]
+    },
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        { "name": "git-prefix", "cmd": "git", "args": ["rev-parse", "--show-prefix"] },
+        { "name": "git-add", "cmd": "git", "args": ["add", "-A"] },
+        {
+          "name": "git-commit",
+          "cmd": "git",
+          "args": ["commit", "-m", { "validator": "^Study: \\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}-\\d{2}:\\d{2}$" }]
+        },
+        { "name": "git-push", "cmd": "git", "args": ["push"] }
+      ]
     }
   ]
 }

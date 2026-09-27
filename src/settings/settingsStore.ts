@@ -2,15 +2,20 @@ import { BaseDirectory, exists, mkdir, readTextFile, writeTextFile } from "@taur
 
 export interface Settings {
   vaultPath: string | null; // null = no vault chosen yet
+  autoCommit: boolean;
+  autoPush: boolean; // only used when autoCommit is on
+  alwaysOnTop: boolean;
 }
+
+const defaults: Settings = { vaultPath: null, autoCommit: false, autoPush: false, alwaysOnTop: false };
 
 const FILE = "settings.json";
 const inAppData = { baseDir: BaseDirectory.AppData };
 
 export async function loadSettings(): Promise<Settings> {
-  if (!(await exists(FILE, inAppData))) return { vaultPath: null };
+  if (!(await exists(FILE, inAppData))) return { ...defaults };
   const text = await readTextFile(FILE, inAppData);
-  return JSON.parse(text) as Settings;
+  return { ...defaults, ...JSON.parse(text) }; // old files lack the new fields
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {

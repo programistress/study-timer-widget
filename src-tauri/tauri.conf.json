@@ -14,8 +14,12 @@
     "windows": [
       {
         "title": "study-timer",
-        "width": 800,
-        "height": 600
+        "width": 380,
+        "height": 345,
+        "minWidth": 260,
+        "minHeight": 236,
+        "resizable": true,
+        "decorations": false
       }
     ],
     "security": {
